@@ -1,0 +1,273 @@
+import pandas as pd
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils.dataframe import dataframe_to_rows
+
+# Create workbook and worksheet
+wb = Workbook()
+ws = wb.active
+ws.title = "Bug Report"
+
+# Define headers
+headers = [
+    "Bug ID", "Title", "Category", "Steps to Reproduce", "Expected Behavior", 
+    "Actual Behavior", "Devices Used", "Severity", "Priority", "Status", 
+    "Assigned To", "Reporter", "Date Reported", "Target Sprint", 
+    "Estimated Fix Time", "Actual Fix Time", "Resolution", "Notes", "Attachment"
+]
+
+# Add headers to worksheet
+for col, header in enumerate(headers, 1):
+    cell = ws.cell(row=1, column=col, value=header)
+    cell.font = Font(bold=True, color="FFFFFF")
+    cell.fill = PatternFill(start_color="8B0000", end_color="8B0000", fill_type="solid")
+    cell.alignment = Alignment(horizontal="center", vertical="center")
+
+# Define data for bug report
+bug_data = [
+    ["BUG-001", "Country Code Auto-Selection Not Working", "Onboarding", 
+     "1. Go to 'Get the App' step in onboarding\n2. Enter +234 in phone number field\n3. Try to enter complete phone number", 
+     "When user enters +234, country code should automatically select Nigeria and allow complete phone number entry", 
+     "Country code doesn't respond to +234 input, preventing complete phone number entry", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "2-3 days", "", "", "", "AutoselectCountrycode.mov"],
+    
+    ["BUG-002", "Resend OTP Feature Not Working", "Authentication", 
+     "1. Complete sign up process\n2. On OTP verification page\n3. Click 'Resend OTP' button", 
+     "Clicking 'Resend OTP' should send new OTP code", 
+     "Resend OTP button doesn't function", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Critical", "Critical", "Open", "", "QA Team", "", "Sprint 1", "1-2 days", "", "", "", ""],
+    
+    ["BUG-003", "Session Handling Issue on Email Correction", "Authentication", 
+     "1. Start signup with wrong email\n2. Go back and enter correct email\n3. Try to complete signup", 
+     "User should be able to correct email and continue signup", 
+     "User cannot sign up with correct email after wrong email attempt, must clear cache or use new browser", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Critical", "Critical", "Open", "", "QA Team", "", "Sprint 1", "2-3 days", "", "", "", ""],
+    
+    ["BUG-004", "Create Folder Button and entire Resource Page Disappears on Double Click", "Resources", 
+     "1. Go to Resources page\n2. Click 'Add Folder' button twice quickly\n3. Observe button disappearance and empty page\n4. Try logging out and back in\n5. Observe issue persists", 
+     "Add Folder button should remain visible after clicking", 
+     "Button disappears when clicked twice, making Resources page completely unusable. Logging out and back in doesn't fix the issue", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Critical", "Critical", "Open", "", "QA Team", "", "Sprint 1", "1-2 days", "", "", "", "MissingFolder.mov"],
+    
+    ["BUG-005", "Signout Validation Message Persists", "UI/UX", 
+     "1. Sign out of account\n2. Try to sign up new user\n3. Observe persistent validation message", 
+     "Validation message should clear after signout", 
+     "Signout validation message remains on nav bar when signing up new user", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1 day", "", "", "", "PersistedLogoutMessage.mov"],
+    
+    ["BUG-006", "File Upload Rejects Supported Formats", "Resources", 
+     "1. Go to Resources folder\n2. Try to upload MPEG file\n3. Observe rejection", 
+     "System should accept MPEG files as advertised", 
+     "MPEG files are rejected despite being listed as supported", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "1-2 days", "", "", "", "Mpeg_not_allowed.mov"],
+    
+    ["BUG-007", "Multiple Ellipses Can Be Open Simultaneously", "UI/UX", 
+     "1. Open Resources folder with multiple items\n2. Click ellipsis on one item\n3. Click ellipsis on another item\n4. Observe both menus open", 
+     "Only one ellipsis menu should be open at a time", 
+     "Multiple ellipsis menus can be open simultaneously", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1 day", "", "", "", "Double_Elippse.mov"],
+    
+    ["BUG-008", "Client Addition Shows Before Confirmation", "Client Management", 
+     "1. Open 'Manage Clients' modal\n2. Search and select client\n3. Observe client appears added before clicking 'Done'", 
+     "Clients should only appear as added after clicking 'Done'", 
+     "Clients appear as added before clicking 'Done'", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Low", "Low", "Open", "", "QA Team", "", "Sprint 3", "1 day", "", "", "", "Client_Immature_display.mov"],
+    
+    ["BUG-009", "Forgot Password Page Missing CSS", "UI/UX", 
+     "1. Click 'Forgot your password?' link\n2. Observe unstyled page", 
+     "Forgot password page should have proper styling", 
+     "Page displays only HTML without CSS styling", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "1 day", "", "", "", "NoCSS.jpeg"],
+    
+    ["BUG-010", "Duplicate Error Message on Login", "Authentication", 
+     "1. Enter incorrect email/password\n2. Click 'Sign in'\n3. Observe duplicate error message", 
+     "Single, clear error message should be displayed", 
+     "Duplicate error message appears", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Low", "Low", "Open", "", "QA Team", "", "Sprint 3", "1 day", "", "", "", "Duplicate Error Message.jpeg"],
+    
+    ["BUG-011", "Multiple Message for Password Reset on multiple click", "Authentication", 
+     "1. Go to forgot password page\n2. Enter email and click 'Send me reset password instructions' multiple times\n3. Observe no confirmation message", 
+     "User should receive confirmation that password reset email was sent and apply rate limit", 
+     "No validation message appears when sending password reset", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1-2 days", "", "", "", "MultipleResetPassword.mov"],
+    
+    ["BUG-012", "Session Handling: Reset Password Redirects to Dashboard", "Authentication", 
+     "1. Be logged in to account\n2. Click reset password link in email\n3. Observe redirect to dashboard", 
+     "Reset password should open password reset page", 
+     "Reset password link redirects to dashboard when user is logged in", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Critical", "Critical", "Open", "", "QA Team", "", "Sprint 1", "2-3 days", "", "", "", "ForgetPassordSession.mov"],
+    
+    ["BUG-013", "Confirmation Error on Resend", "Authentication", 
+     "1. Click reset password link without resetting\n2. Click 'Didn't receive confirmation instructions?'\n3. Enter email and click 'Resend confirmation instructions'\n4. Observe error message", 
+     "Resend confirmation should work properly", 
+     "Error occurs when trying to resend confirmation instructions", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "1-2 days", "", "", "", ""],
+    
+    ["BUG-014", "Forgot Password Links Missing Hover Cursor", "UI/UX", 
+     "1. Hover over any clickable link on Reset Password Page\n2. Observe missing pointer cursor", 
+     "Links should show pointer cursor on hover", 
+     "Links don't show pointer cursor when hovering", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Low", "Low", "Open", "", "QA Team", "", "Sprint 3", "1 day", "", "", "", "NoCursor.mov"],
+    
+    ["BUG-015", "Incomplete Error Message for Empty Email", "Validation", 
+     "1. Leave email field empty\n2. Fill first name and last name\n3. Click 'Get Started'\n4. Observe generic error message", 
+     "Clear error message should prompt user to enter email", 
+     "Generic 'Invalid email' message for empty field", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1 day", "", "", "", "Promptuser.mov"],
+    
+    ["BUG-016", "Space-Only Input Causes Generic Error", "Validation", 
+     "1. Enter spaces in first name, last name, and password fields\n2. Click 'Get Started'\n3. Observe generic error message", 
+     "Specific validation message for space-only input", 
+     "Generic error message for space-only input or trim space", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "1-2 days", "", "", "", "SpaceInput.mov"],
+    
+    ["BUG-017", "Password Reset Banner Persists", "UI/UX", 
+     "1. Send password reset email\n2. Go back to login page\n3. Observe persistent banner", 
+     "Banner should clear after navigation", 
+     "Password reset banner remains on login page", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1 day", "", "", "", "PasswoedBannwer.mov"],
+    
+    ["BUG-018", "Name Fields Accept Long Text and Special Characters", "Validation", 
+     "1. Enter long paragraph in first name field\n2. Enter special characters and SQL injection attempts\n3. Create account\n4. Observe broken UI", 
+     "Name fields should have length limits and character validation", 
+     "Long paragraphs and special characters are accepted, breaking UI", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Critical", "Critical", "Open", "", "QA Team", "", "Sprint 1", "2-3 days", "", "", "", "FirstLastNmae.jpeg"],
+    
+    ["BUG-019", "Onboarding Dropdowns Not Required", "Onboarding", 
+     "1. Go to Personal tab in onboarding\n2. Leave all dropdowns unselected\n3. Click 'NEXT'\n4. Observe progression without selection", 
+     "All dropdown fields should be required", 
+     "User can proceed without selecting any dropdown options", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "1-2 days", "", "", "", "OnbordingOption.mov"],
+    
+    ["BUG-020", "Folder Name Field No Length Validation", "Resources", 
+     "1. Create new folder\n2. Enter very long folder name\n3. Create folder\n4. Observe UI distortion", 
+     "Folder name should have length limits", 
+     "Long folder names are accepted, distorting UI", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "1 day", "", "", "", "LongFolderName.mov"],
+    
+    ["BUG-021", "Preview Icon Opens Download Instead of Preview", "Resources", 
+     "1. Upload GIF file\n2. Click eye icon next to file\n3. Observe download modal instead of preview", 
+     "Eye icon should open preview modal", 
+     "Eye icon opens download modal instead of preview", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1-2 days", "", "", "", "Wrong_Preview_Operation.mov"],
+    
+    ["BUG-022", "Video/Link Name Fields Break UI", "Resources", 
+     "1. Add video or link with very long name\n2. Save the resource\n3. Observe broken UI and hidden ellipsis menu", 
+     "Name fields should have length limits and wrap text", 
+     "Long names break Resources page UI, hiding ellipsis menu", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "2-3 days", "", "", "", "Break_VideoLink.mov, Break_Vs_NoBreak.mov"],
+    
+    ["BUG-023", "Video Playback Not Working", "Resources", 
+     "1. Add YouTube video with long name\n2. Try to play the video\n3. Observe playback issues", 
+     "YouTube videos should be playable", 
+     "YouTube videos cannot be played due to UI issues", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "2-3 days", "", "", "", "Break_VideoLink.mov, Break_Vs_NoBreak.mov"],
+    
+    ["BUG-024", "Weak Password Validation", "Security", 
+     "1. Try to create account with weak password e.g., (123456)\n2. Observe only character count validation\n3. Note lack of security requirements", 
+     "Password should have strong security requirements", 
+     "Only character count validation (6+ chars), no security requirements", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Critical", "Critical", "Open", "", "QA Team", "", "Sprint 1", "2-3 days", "", "", "", ""],
+    
+    ["BUG-025", "Onboarding Personal Tab Should Be Required", "Onboarding", 
+     "1. Go to Personal tab\n2. Leave all fields unselected\n3. Click 'NEXT'\n4. Observe progression without required data", 
+     "Personal tab fields should be mandatory", 
+     "User can skip all personal information", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "1-2 days", "", "", "", ""],
+    
+    ["BUG-026", "Unsplash Image Cannot Be Unselected", "UI/UX", 
+     "1. Open Unsplash modal\n2. Select an image\n3. Try to unselect the image\n4. Observe no unselect option", 
+     "User should be able to unselect image", 
+     "No option to unselect image, only close modal or select another", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1-2 days", "", "", "", "UnselectSplash.mov"],
+    
+    ["BUG-027", "Selected Color Not Reflected", "Onboarding", 
+     "1. Go to Business tab in onboarding\n2. Select a brand color\n3. Observe color not reflected on page", 
+     "Selected brand color should be visible on page", 
+     "Selected color doesn't appear on the page", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1-2 days", "", "", "", ""],
+    
+    ["BUG-028", "Wistia Video URL Not Accepted", "Resources", 
+     "1. Go to Add Video section\n2. Enter valid Wistia video URL\n3. Observe rejection", 
+     "System should accept Wistia URLs as advertised", 
+     "Wistia video URLs are rejected", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "High", "High", "Open", "", "QA Team", "", "Sprint 1", "1-2 days", "", "", "", "Wistia_Not_Upload.mov"],
+    
+    ["BUG-029", "Cover Image: Misleading 'Edit Image' state after user cancels image upload from Unsplash", "UI/UX", 
+     "1. Click the area to Add Cover Image\n2. Select either 'From Computer' or 'From Unsplash'\n3. Without selecting or uploading an image, click the Cancel button or close the modal\n4. Observe the Cover Image area now displays 'Edit Image'", 
+     "If the user initiates adding a cover image From Unsplash but cancels the process (e.g., closes the modal), the image card should revert to its initial 'Empty' or 'Add Image' state", 
+     "The Cover Image card immediately changes its display to an 'Edit Image' or 'Image Set' state, even though no image has been successfully added. This is misleading and suggests an image has been set", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Low", "Low", "Open", "", "QA Team", "", "Sprint 3", "1 day", "", "", "", "Fake Edit.mov"],
+    
+    ["BUG-030", "Cover Image: Post-deletion state requires hover to show 'Add Image' options", "UI/UX", 
+     "1. Go to the page with a set Cover Image\n2. Click 'Edit Cover Image'\n3. Click the Delete option\n4. Observe the image is gone, but the card still shows 'Edit Cover Image'", 
+     "After a user successfully deletes an image from the Cover Image card, the card should revert to its clear, initial state with visible primary call-to-action buttons (e.g., 'From Computer,' 'From Unsplash,' or a large '+ Add Image' button)", 
+     "After deletion, the card still shows the 'Edit Cover Image' text. The user must specifically hover over the card to reveal the actual options to upload a new image (From Computer, From Unsplash). This hides the functionality and misleads the user", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Low", "Low", "Open", "", "QA Team", "", "Sprint 3", "1 day", "", "", "", "PostDelete.mov"],
+    
+    ["BUG-031", "Reset Password: Error when submitting empty password fields", "Authentication", 
+     "1. Navigate to Reset password page\n2. Click 'Change Password' without entering any password\n3. Observe error message and network response", 
+     "Should show client-side validation preventing form submission with appropriate error message like 'Password is required'", 
+     "Throws server error: 'The change you wanted was rejected. Maybe you tried to change something you didn't have access to. If you are the application owner check the logs for more information.' with 422 error on the network", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1-2 days", "", "", "", "422Error.mov"],
+    
+    ["BUG-032", "Reset Password: Incomplete error message when user is logged in", "Authentication", 
+     "1. Ensure user is logged in\n2. Navigate to reset password page\n3. Attempt to reset password\n4. Observe error message", 
+     "Should show complete, clear error message explaining the issue or redirect appropriately", 
+     "Shows incomplete error message: 'Change your password 1 error prohibited this user from being saved:' (message appears cut off or incomplete)", 
+     "Browser: Chrome, OS: macOS, Device: Desktop", "Medium", "Medium", "Open", "", "QA Team", "", "Sprint 2", "1-2 days", "", "", "", "ForgetPasswordLogin.jpeg"]
+]
+
+# Add data to worksheet
+for row, data in enumerate(bug_data, 2):
+    for col, value in enumerate(data, 1):
+        ws.cell(row=row, column=col, value=value)
+
+# Apply formatting
+thin_border = Border(
+    left=Side(style='thin'),
+    right=Side(style='thin'),
+    top=Side(style='thin'),
+    bottom=Side(style='thin')
+)
+
+# Apply borders and alignment to all cells
+for row in ws.iter_rows():
+    for cell in row:
+        cell.border = thin_border
+        cell.alignment = Alignment(vertical="top", wrap_text=True)
+
+# Set column widths
+column_widths = [10, 40, 15, 50, 40, 40, 25, 10, 10, 12, 15, 15, 15, 12, 15, 15, 20, 30, 20]
+for i, width in enumerate(column_widths, 1):
+    ws.column_dimensions[ws.cell(row=1, column=i).column_letter].width = width
+
+# Freeze the header row
+ws.freeze_panes = "A2"
+
+# Add filters
+ws.auto_filter.ref = f"A1:{ws.cell(row=1, column=len(headers)).column_letter}1"
+
+# Add conditional formatting for severity
+from openpyxl.formatting.rule import ColorScaleRule
+
+# Color code severity levels
+critical_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
+high_fill = PatternFill(start_color="FFA500", end_color="FFA500", fill_type="solid")
+medium_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+low_fill = PatternFill(start_color="90EE90", end_color="90EE90", fill_type="solid")
+
+# Apply severity coloring
+for row in range(2, len(bug_data) + 2):
+    severity_cell = ws.cell(row=row, column=8)  # Severity column
+    if severity_cell.value == "Critical":
+        severity_cell.fill = critical_fill
+    elif severity_cell.value == "High":
+        severity_cell.fill = high_fill
+    elif severity_cell.value == "Medium":
+        severity_cell.fill = medium_fill
+    elif severity_cell.value == "Low":
+        severity_cell.fill = low_fill
+
+# Save the workbook
+wb.save("/workspace/Coach_Catalyst_Bug_Report.xlsx")
