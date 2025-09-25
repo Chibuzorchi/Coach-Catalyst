@@ -1,10 +1,10 @@
 # Coach Catalyst - Bug Report
 
 ## Bug Report Summary
-**Total Bugs Found**: 26  
-**Critical**: 8  
+**Total Bugs Found**: 28  
+**Critical**: 9  
 **High Priority**: 10  
-**Medium Priority**: 6  
+**Medium Priority**: 7  
 **Low Priority**: 2  
 
 ---
@@ -16,7 +16,7 @@
 | **BUG-001** | Country Code Auto-Selection Not Working | High | P2 | When user enters +234, country code should automatically select Nigeria and allow complete phone number entry | Country code doesn't respond to +234 input, preventing complete phone number entry | 1. Go to "Get the App" step in onboarding<br>2. Enter +234 in phone number field<br>3. Try to enter complete phone number | Browser: Chrome, OS: macOS, Device: Desktop |
 | **BUG-002** | Resend OTP Feature Not Working | Critical | P1 | Clicking "Resend OTP" should send new OTP code | Resend OTP button doesn't function | 1. Complete sign up process<br>2. On OTP verification page<br>3. Click "Resend OTP" button | Browser: Chrome, OS: macOS, Device: Desktop |
 | **BUG-003** | Session Handling Issue on Email Correction | Critical | P1 | User should be able to correct email and continue signup | User cannot sign up with correct email after wrong email attempt, must clear cache or use new browser | 1. Start signup with wrong email<br>2. Go back and enter correct email<br>3. Try to complete signup | Browser: Chrome, OS: macOS, Device: Desktop |
-| **BUG-004** | Create Folder Button Disappears on Double Click | High | P2 | "Add Folder" button should remain visible after clicking | Button disappears when clicked twice | 1. Go to Resources page<br>2. Click "Add Folder" button twice quickly<br>3. Observe button disappearance | Browser: Chrome, OS: macOS, Device: Desktop |
+| **BUG-004** | Create Folder Button Disappears on Double Click | Critical | P1 | "Add Folder" button should remain visible after clicking | Button disappears when clicked twice, making Resources page completely unusable. Logging out and back in doesn't fix the issue | 1. Go to Resources page<br>2. Click "Add Folder" button twice quickly<br>3. Observe button disappearance and empty page<br>4. Try logging out and back in<br>5. Observe issue persists | Browser: Chrome, OS: macOS, Device: Desktop |
 | **BUG-005** | Signout Validation Message Persists | Medium | P3 | Validation message should clear after signout | Signout validation message remains on nav bar when signing up new user | 1. Sign out of account<br>2. Try to sign up new user<br>3. Observe persistent validation message | Browser: Chrome, OS: macOS, Device: Desktop |
 | **BUG-006** | File Upload Rejects Supported Formats | High | P2 | System should accept GIF and MPEG files as advertised | GIF and MPEG files are rejected despite being listed as supported | 1. Go to Resources folder<br>2. Try to upload GIF or MPEG file<br>3. Observe rejection | Browser: Chrome, OS: macOS, Device: Desktop |
 | **BUG-007** | Multiple Ellipses Can Be Open Simultaneously | Medium | P3 | Only one ellipsis menu should be open at a time | Multiple ellipsis menus can be open simultaneously | 1. Open Resources folder with multiple items<br>2. Click ellipsis on one item<br>3. Click ellipsis on another item<br>4. Observe both menus open | Browser: Chrome, OS: macOS, Device: Desktop |
@@ -51,6 +51,7 @@
 2. **XSS Vulnerability** (BUG-018): Name fields accept HTML/JavaScript that could execute malicious scripts
 3. **Weak Password Policy** (BUG-024): Insufficient password security requirements
 4. **Session Management Issues** (BUG-003, BUG-012): Improper session handling and validation
+5. **Resources Page Complete Failure** (BUG-004): Double-clicking "Add Folder" makes Resources page completely unusable
 
 ### Data Validation Issues:
 1. **Input Length Validation**: Multiple fields lack proper length limits
@@ -65,6 +66,7 @@
 1. **UI Breaking** (BUG-018, BUG-020, BUG-022): Long text inputs break the interface
 2. **Missing Functionality** (BUG-002, BUG-009): Core features not working
 3. **Navigation Issues** (BUG-004, BUG-012): Buttons disappearing, incorrect redirects
+4. **Complete Feature Failure** (BUG-004): Resources page becomes completely unusable after double-click
 
 ### Usability Issues:
 1. **Poor Error Messages** (BUG-010, BUG-015, BUG-016): Generic or duplicate error messages
@@ -80,6 +82,7 @@
 2. Implement proper password security requirements
 3. Fix session handling issues
 4. Fix UI breaking issues with long text inputs
+5. Fix Resources page complete failure after double-clicking "Add Folder"
 
 ### Priority 2 (High - Fix This Sprint):
 1. Fix resend OTP functionality
